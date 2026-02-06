@@ -1,21 +1,47 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Kezdolap from "./components/pages/Kezdolap";
-import Bejelentkezes from "./components/pages/Bejelentkezes";
-import Regisztracio from "./components/pages/Regisztracio";
-import VendegLayout from "./components/layouts/VendegLayout";
+import { Route, Routes } from "react-router-dom";
+import Kezdolap from "./pages/Kezdolap";
+import Bejelentkezes from "./pages/Bejelentkezes";
+import Regisztracio from "./pages/Regisztracio";
+import VendegLayout from "./layouts/VendegLayout";
+import AdminLayout from "./layouts/AdminLayout";
+import KezdolapUser from "./pages/KezdolapUser";
+import UserLayout from "./layouts/UserLayout";
+import useAuthContext from "./contexts/AuthContext";
+
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<VendegLayout />}>
-          <Route index element={<Kezdolap />} />
-          <Route path="bejelentkezes" element={<Bejelentkezes />} />
-          <Route path="regisztracio" element={<Regisztracio />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+    const { user } = useAuthContext();
+    return (
+        <>
+
+            <Routes>
+                {/* Vendég layout */}
+                {!user && (
+                    <Route element={<VendegLayout />}>
+                        <Route path="/" element={<Kezdolap />} />
+                        <Route path="bejelentkezes" element={<Bejelentkezes />} />
+                        <Route path="regisztracio" element={<Regisztracio />} />
+                    </Route>
+                )}
+
+                {/* Admin és User ugyanazon útvonalon */}
+                {user && (
+                    <Route
+                        path="/"
+                        element={
+                            user.role === 1 ? (
+                                <AdminLayout />
+                            ) : (
+                                <UserLayout />
+                            )
+                        }
+                    >
+                        <Route index element={<Kezdolap />} />
+                    </Route>
+                )}
+            </Routes>
+        </>
+    );
 }
 
 export default App;
